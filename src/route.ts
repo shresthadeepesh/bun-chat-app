@@ -1,6 +1,8 @@
-import { Database } from "bun:sqlite";
+import db from "./db";
 
-const db = new Database("mydb.sqlite", { create: true });
+const headers = {
+  "Content-Type": "application/json",
+};
 
 export async function home() {
   const result = await fetch("https://jsonplaceholder.typicode.com/posts")
@@ -13,14 +15,19 @@ export async function home() {
   };
 
   return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "applicatiobn/json",
-    },
+    headers,
   });
 }
 
+interface Post {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+
 export async function asyncHome(req: Request) {
-  const result = await Promise.allSettled([
+  const result = await Promise.allSettled<[Post, Post, Post]>([
     fetch("https://jsonplaceholder.typicode.com/posts/1")
       .then((res) => res.json())
       .then((res) => res),
@@ -40,27 +47,25 @@ export async function asyncHome(req: Request) {
         message: "Failed to call some api.",
       }),
       {
-        headers: {
-          "Content-Type": "applicatiobn/json",
-        },
+        headers,
       }
     );
   }
 
   const data = {
     message: "Success",
-    data: result.map((el) => el.value),
+    data: result.map((el) => el?.value),
   };
 
   return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "applicatiobn/json",
-    },
+    headers,
   });
 }
 
-export async function createPost() {
-  const query = db.query("create table posts");
+export async function createPostTable() {
+  const query = db.query(
+    "create table posts(id int auto_increment primary key, title varchar(255), body text, createdAt datetime, updatedAt datetime)"
+  );
   query.run();
 
   return new Response(
@@ -68,13 +73,9 @@ export async function createPost() {
       message: "DB and table has been created.",
     }),
     {
-      headers: {
-        "Content-Type": "applicatiobn/json",
-      },
+      headers,
     }
   );
 
   //   const query = db.query("");
 }
-
-export async function posts() {}

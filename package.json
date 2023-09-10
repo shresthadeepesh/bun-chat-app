@@ -3,10 +3,12 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build --target=bun ./src/index.ts --outdir=dist --outfile=index.js",
+    "build": "bun build --target=bun ./src/index.ts --outdir=dist --outfile=index.js --minify",
     "start:prod": "bun run ./dist/index.js",
     "watch": "bun --watch ./src/index.ts",
-    "start": "bun run ./src/index.ts"
+    "start": "bun run ./src/index.ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "devDependencies": {
     "bun-types": "latest"
